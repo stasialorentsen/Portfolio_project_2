@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.portfolio_project_2;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -24,8 +24,16 @@ public class BachelorProgramBuilder extends Application {
         baseProgramBox = new ComboBox<>();
         subjectModuleBox = new ComboBox<>();
 
+        // Load the SQLite JDBC driver
+        try {
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
+
         // Fetch base programs from the database
-        List<String> basePrograms = fetchDataFromDatabase("SELECT ProgramName FROM BachelorPrograms");
+        List<String> basePrograms = fetchDataFromDatabase("SELECT name FROM BachelorProgram");
 
         baseProgramBox.getItems().addAll(basePrograms);
 
@@ -45,7 +53,7 @@ public class BachelorProgramBuilder extends Application {
         subjectModuleBox.getItems().clear();
 
         // Fetch subject modules for the selected program from the database
-        List<String> subjectModules = fetchDataFromDatabase("SELECT SubjectModuleName FROM SubjectModules WHERE ProgramName = '" + program + "'");
+        List<String> subjectModules = fetchDataFromDatabase("SELECT name FROM StudyActivity WHERE type_id = 2 AND program_id = (SELECT program_id FROM BachelorProgram WHERE name = '" + program + "')");
 
         // Add the new subject modules to the subjectModuleBox
         subjectModuleBox.getItems().addAll(subjectModules);
@@ -53,7 +61,7 @@ public class BachelorProgramBuilder extends Application {
 
     private List<String> fetchDataFromDatabase(String query) {
         List<String> data = new ArrayList<>();
-        String url = "jdbc:sqlite:path/to/your/database.db";
+        String url = "jdbc:sqlite:identifier.sqlite";
 
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement();

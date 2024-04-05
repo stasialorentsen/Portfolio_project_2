@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="62274121-598f-4a62-9b2e-ca503e17b27d" name="Changes" comment="studyActivityBox implemented, code comments">
+    <list default="true" id="62274121-598f-4a62-9b2e-ca503e17b27d" name="Changes" comment="studyActivityBox implemented, StudentProgram implemented">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/identifier.sqlite" beforeDir="false" afterPath="$PROJECT_DIR$/identifier.sqlite" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/portfolio_project_2/BachelorProgramBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/portfolio_project_2/BachelorProgramBuilder.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -110,7 +109,7 @@
       <workItem from="1712176383071" duration="1402000" />
       <workItem from="1712232007334" duration="5617000" />
       <workItem from="1712313554519" duration="6980000" />
-      <workItem from="1712348172243" duration="4810000" />
+      <workItem from="1712348172243" duration="5580000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -144,7 +143,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712239319326</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="studyActivityBox implemented, StudentProgram implemented">
+      <option name="closed" value="true" />
+      <created>1712353171957</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1712353171957</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -167,7 +174,8 @@
     <MESSAGE value="SQLLite fix" />
     <MESSAGE value="studyActivityBox implemented" />
     <MESSAGE value="studyActivityBox implemented, code comments" />
-    <option name="LAST_COMMIT_MESSAGE" value="studyActivityBox implemented, code comments" />
+    <MESSAGE value="studyActivityBox implemented, StudentProgram implemented" />
+    <option name="LAST_COMMIT_MESSAGE" value="studyActivityBox implemented, StudentProgram implemented" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

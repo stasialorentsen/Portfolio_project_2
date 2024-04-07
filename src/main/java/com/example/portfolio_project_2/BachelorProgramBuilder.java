@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.geometry.Insets;
 import java.sql.*;
@@ -21,6 +22,7 @@ public class BachelorProgramBuilder extends Application {
     private static final String ACTIVITY_QUERY = "SELECT type_id, ects FROM StudyActivity WHERE activity_id = ";
     private static final String ACTIVITY_INFO_QUERY = "SELECT activity_id, name FROM StudyActivity WHERE program_id = ";
 
+    private TextField studentId;
     private ComboBox<String> bachelorProgramBox;
     private ComboBox<String> studyActivityBox;
     private Button addButton;
@@ -36,6 +38,11 @@ public class BachelorProgramBuilder extends Application {
 
     // Handle GUI setup
     private void setupStage(Stage stage) {
+        studentId = new TextField();
+        // Listener to handle studentId change
+        studentId.textProperty().addListener((observable, oldValue, newValue) -> {
+            activityAdded.clear();
+        });
         bachelorProgramBox = new ComboBox<>();
         studyActivityBox = new ComboBox<>();
         activityAdded = new TextArea();
@@ -64,10 +71,11 @@ public class BachelorProgramBuilder extends Application {
         gridPane.setPadding(new Insets(10, 10, 10, 10));
         gridPane.setVgap(5);
         gridPane.setHgap(5);
-        gridPane.addRow(0, bachelorProgramBox);
-        gridPane.addRow(1, studyActivityBox);
-        gridPane.addRow(2, addButton);
-        gridPane.addRow(3, activityAdded);
+        gridPane.addRow(0, studentId);
+        gridPane.addRow(1, bachelorProgramBox);
+        gridPane.addRow(2, studyActivityBox);
+        gridPane.addRow(3, addButton);
+        gridPane.addRow(4, activityAdded);
 
         Scene scene = new Scene(gridPane, 500, 500);
         stage.setTitle("BachelorProgramBuilder");
@@ -104,11 +112,12 @@ public class BachelorProgramBuilder extends Application {
         Map<String, Integer> activityInfo = fetchActivityInformation(activityId);
         try (Connection conn = DriverManager.getConnection(DATABASE_URL);
              PreparedStatement pstmt = conn.prepareStatement(
-                     "INSERT INTO StudentProgram (program_id, activity_id, type_id, ects) VALUES (?, ?, ?, ?)")) {
-            pstmt.setInt(1, programId);
-            pstmt.setInt(2, activityId);
-            pstmt.setInt(3, activityInfo.get("type_id"));
-            pstmt.setInt(4, activityInfo.get("ects"));
+                     "INSERT INTO StudentProgram (student_id, program_id, activity_id, type_id, ects) VALUES (?, ?, ?, ?, ?)")) {
+            pstmt.setInt(1, Integer.parseInt(studentId.getText()));
+            pstmt.setInt(2, programId);
+            pstmt.setInt(3, activityId);
+            pstmt.setInt(4, activityInfo.get("type_id"));
+            pstmt.setInt(5, activityInfo.get("ects"));
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

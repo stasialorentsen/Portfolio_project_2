@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.ColumnConstraints;
@@ -35,11 +36,14 @@ public class BachelorProgramBuilder extends Application {
     private TextArea subject1Added = new TextArea();
     private TextArea subject2Added = new TextArea();
     private TextArea electiveAdded = new TextArea();
+    private TextField totalEctsField = new TextField("Total ECTS: ");
 
     private Map<String, Integer> programsMap;
     private Map<String, Integer> activitiesMap;
     private Map<String, Integer> modulesMap1;
     private Map<String, Integer> modulesMap2;
+    private Map<String, Integer> subjectMap1;
+    private Map<String, Integer> subjectMap2;
 
     @Override
     public void start(Stage stage) {
@@ -70,6 +74,9 @@ public class BachelorProgramBuilder extends Application {
         addSubject1Button.setMaxWidth(Double.MAX_VALUE);
         addSubject2Button.setMaxWidth(Double.MAX_VALUE);
         addElectiveButton.setMaxWidth(Double.MAX_VALUE);
+
+        totalEctsField.setDisable(true); // Disable editing
+        gridPane.add(totalEctsField, 0, 6, 4, 1);
 
         gridPane.add(bachelorProgramBox, 0, 0); // Top of the first column
         gridPane.add(basicsLabel, 0, 1); // 2nd row in the first column
@@ -108,6 +115,8 @@ public class BachelorProgramBuilder extends Application {
             } else {
                 this.basicsAdded.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
             }
+            int activityId = this.activitiesMap.get(selectedItem);
+            addToMyProgram(activityId);
         });
 
         this.addSubject1Button.setOnAction(event -> {
@@ -116,12 +125,15 @@ public class BachelorProgramBuilder extends Application {
             if (selectedItem == null || selectedItem.trim().isEmpty()) {
                 return; // nothing selected
             }
-
             String existingContents = this.subject1Added.getText();
             if (existingContents == null || existingContents.trim().isEmpty()) {
                 this.subject1Added.setText(selectedItem); // if textArea is empty, set the selectedItem directly
             } else {
                 this.subject1Added.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
+            }
+            if (this.subjectMap1.containsKey(selectedItem)) { // change from modulesMap1 to subjectMap1
+                int activityId = this.subjectMap1.get(selectedItem); // change from modulesMap1 to subjectMap1
+                addToMyProgram(activityId);
             }
         });
 
@@ -138,6 +150,10 @@ public class BachelorProgramBuilder extends Application {
             } else {
                 this.subject2Added.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
             }
+            if (this.subjectMap2.containsKey(selectedItem)) { // change from modulesMap2 to subjectMap2
+                int activityId = this.subjectMap2.get(selectedItem); // change from modulesMap2 to subjectMap2
+                addToMyProgram(activityId);
+            }
         });
 
         this.addElectiveButton.setOnAction(event -> {
@@ -153,6 +169,8 @@ public class BachelorProgramBuilder extends Application {
             } else {
                 this.electiveAdded.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
             }
+            int activityId = this.activitiesMap.get(selectedItem);
+            addToMyProgram(activityId);
         });
 
         programsMap = fetchBachelorPrograms(PROGRAM_QUERY);
@@ -187,8 +205,12 @@ public class BachelorProgramBuilder extends Application {
                 if (newValue1) { // When focus is gained
                     Subject1Box.getItems().clear(); // Clear here before fetching data
                     Integer selectedModule1Id = modulesMap1.get(SubjectModule1Box.getSelectionModel().getSelectedItem());
-                    activitiesMap = fetchModuleActivities(selectedProgramId, selectedModule1Id, 2, 4);
-                    Subject1Box.getItems().addAll(activitiesMap.keySet());
+//                    activitiesMap = fetchModuleActivities(selectedProgramId, selectedModule1Id, 2, 4);
+//                    Subject1Box.getItems().addAll(activitiesMap.keySet());
+//                }
+//            });
+                    this.subjectMap1 = fetchModuleActivities(selectedProgramId, selectedModule1Id, 2, 4); // Save returned map to reference later
+                    Subject1Box.getItems().addAll(this.subjectMap1.keySet());
                 }
             });
             SubjectModule2Box.focusedProperty().addListener((observable1, oldValue1, newValue1) -> {
@@ -203,8 +225,12 @@ public class BachelorProgramBuilder extends Application {
                 if (newValue1) { // When focus is gained
                     Subject2Box.getItems().clear(); // Clear here before fetching data
                     Integer selectedModule2Id = modulesMap2.get(SubjectModule2Box.getSelectionModel().getSelectedItem());
-                    activitiesMap = fetchModuleActivities(selectedProgramId, selectedModule2Id, 2, 4);
-                    Subject2Box.getItems().addAll(activitiesMap.keySet());
+//                    activitiesMap = fetchModuleActivities(selectedProgramId, selectedModule2Id, 2, 4);
+//                    Subject2Box.getItems().addAll(activitiesMap.keySet());
+//                }
+//            });
+                    this.subjectMap2 = fetchModuleActivities(selectedProgramId, selectedModule2Id, 2, 4); // Save returned map to reference later
+                    Subject2Box.getItems().addAll(this.subjectMap2.keySet());
                 }
             });
             // Elective
@@ -302,7 +328,9 @@ public class BachelorProgramBuilder extends Application {
             System.out.println(query);
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                data.put(rs.getString("name") + " (" + rs.getInt("ects") + " ects)", rs.getInt("activity_id"));
+                int activityId = rs.getInt("activity_id");
+                String activityNameAndEcts = rs.getString("name") + " (" + rs.getInt("ects") + " ects)";
+                data.put(activityNameAndEcts, activityId);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -335,6 +363,44 @@ public class BachelorProgramBuilder extends Application {
             e.printStackTrace();
         }
         return data;
+    }
+
+    //Add selected activities to MyProgram
+    private void addToMyProgram(int activityId) {
+        try (Connection conn = DriverManager.getConnection(DATABASE_URL);
+             PreparedStatement pstmt = conn.prepareStatement(
+                     "INSERT INTO MyProgram SELECT * FROM StudyActivity WHERE activity_id = ?")) {
+            if (conn != null) {
+                System.out.println("Connected to the database.");
+                pstmt.setInt(1, activityId);
+                int result = pstmt.executeUpdate();
+                if (result > 0) {
+                    System.out.println("Activity Added to MyProgram");
+                } else {
+                    System.out.println("The activity could not be added to MyProgram.");
+                }
+                fetchAndDisplayTotalEcts(totalEctsField);
+            } else {
+                System.out.println("Failed to make connection!");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void fetchAndDisplayTotalEcts(TextField textField) {
+        String query = "SELECT SUM(ects) as total_ects FROM MyProgram";
+        try {
+            Connection conn = DriverManager.getConnection(DATABASE_URL);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            if (rs.next()) {
+                int totalEcts = rs.getInt("total_ects");
+                textField.setText(String.valueOf(totalEcts)); // Set to TextField
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
     public static void main(String[] args) {
         launch(args);

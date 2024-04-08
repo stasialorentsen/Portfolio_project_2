@@ -18,9 +18,8 @@ public class BachelorProgramBuilder extends Application {
 
     private static final String DATABASE_URL = "jdbc:sqlite:identifier.sqlite";
     private static final String PROGRAM_QUERY = "SELECT program_id, name FROM BachelorProgram";
-    private static final String BASIC_ACTIVITY_QUERY = "SELECT activity_id, name, type_id FROM StudyActivity where program_id = ";
+    private static final String ACTIVITY_QUERY = "SELECT activity_id, name, type_id FROM StudyActivity where program_id = ";
     private static final String MODULES_QUERY = "SELECT module_id, name FROM SubjectModule";
-    private static final String MODULE_ACTIVITY_QUERY = "SELECT activity_id, name, type_id FROM StudyActivity where program_id = ";
     private ComboBox<String> bachelorProgramBox = new ComboBox<>();
     private ComboBox<String> basicStudiesBox = new ComboBox<>();
     private ComboBox<String> SubjectModule1Box = new ComboBox<>();
@@ -180,7 +179,7 @@ public class BachelorProgramBuilder extends Application {
 
     // Fetch study activities for a program
     private Map<String, Integer> fetchBasicActivities(int programId, int... activityTypes) {
-        StringBuilder sb = new StringBuilder(BASIC_ACTIVITY_QUERY);
+        StringBuilder sb = new StringBuilder(ACTIVITY_QUERY);
         sb.append(programId);
         sb.append(" AND type_id IN (");
         for (int i = 0; i < activityTypes.length; i++) {
@@ -189,7 +188,7 @@ public class BachelorProgramBuilder extends Application {
                 sb.append(",");
             }
         }
-        sb.append(") AND module_id is NULL"); // add this line
+        sb.append(") AND module_id IS NULL");
         Map<String, Integer> data = new HashMap<>();
         try {
             Connection conn = DriverManager.getConnection(DATABASE_URL);
@@ -198,7 +197,7 @@ public class BachelorProgramBuilder extends Application {
             System.out.println(query);
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                data.put(rs.getString("name"), rs.getInt("type_id"));
+                data.put(rs.getString("name"), rs.getInt("activity_id"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -224,7 +223,7 @@ public class BachelorProgramBuilder extends Application {
 
     //Fetch module activities
     private Map<String, Integer> fetchModuleActivities(int programId, int moduleId, int... activityTypes) {
-        StringBuilder sb = new StringBuilder(MODULE_ACTIVITY_QUERY);
+        StringBuilder sb = new StringBuilder(ACTIVITY_QUERY);
         sb.append(programId);
         sb.append(" AND type_id IN (");
         for (int i = 0; i < activityTypes.length; i++) {
@@ -242,7 +241,7 @@ public class BachelorProgramBuilder extends Application {
             System.out.println(query);
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                data.put(rs.getString("name"), rs.getInt("type_id"));
+                data.put(rs.getString("name"), rs.getInt("activity_id"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -251,7 +250,7 @@ public class BachelorProgramBuilder extends Application {
     }
     //Fetch elective activities
     private Map<String, Integer> fetchElectiveActivities(int programId, int... activityTypes) {
-        StringBuilder sb = new StringBuilder(BASIC_ACTIVITY_QUERY);
+        StringBuilder sb = new StringBuilder(ACTIVITY_QUERY);
         sb.append(programId);
         sb.append(" AND type_id IN (");
         for (int i = 0; i < activityTypes.length; i++) {
@@ -260,7 +259,7 @@ public class BachelorProgramBuilder extends Application {
                 sb.append(",");
             }
         }
-        sb.append(") AND module_id is NULL"); // add this line
+        sb.append(")");  // Added this to close the parenthesis
         Map<String, Integer> data = new HashMap<>();
         try {
             Connection conn = DriverManager.getConnection(DATABASE_URL);
@@ -269,7 +268,7 @@ public class BachelorProgramBuilder extends Application {
             System.out.println(query);
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                data.put(rs.getString("name"), rs.getInt("type_id"));
+                data.put(rs.getString("name"), rs.getInt("activity_id"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

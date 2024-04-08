@@ -1,4 +1,5 @@
 package com.example.portfolio_project_2;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -12,10 +13,14 @@ import javafx.geometry.Insets;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
+
 public class BachelorProgramBuilder extends Application {
+
     private static final String DATABASE_URL = "jdbc:sqlite:identifier.sqlite";
     private static final String PROGRAM_QUERY = "SELECT program_id, name FROM BachelorProgram";
-    private static final String ACTIVITY_QUERY = "SELECT activity_id, name, type_id FROM StudyActivity where program_id = ";
+    private static final String BASIC_ACTIVITY_QUERY = "SELECT activity_id, name, type_id FROM StudyActivity where program_id = ";
+    private static final String MODULES_QUERY = "SELECT module_id, name FROM SubjectModule";
+    private static final String MODULE_ACTIVITY_QUERY = "SELECT activity_id, name, type_id FROM StudyActivity where program_id = ";
     private ComboBox<String> bachelorProgramBox = new ComboBox<>();
     private ComboBox<String> basicStudiesBox = new ComboBox<>();
     private ComboBox<String> SubjectModule1Box = new ComboBox<>();
@@ -31,8 +36,12 @@ public class BachelorProgramBuilder extends Application {
     private TextArea subject1Added = new TextArea();
     private TextArea subject2Added = new TextArea();
     private TextArea electiveAdded = new TextArea();
+
     private Map<String, Integer> programsMap;
     private Map<String, Integer> activitiesMap;
+    private Map<String, Integer> modulesMap1;
+    private Map<String, Integer> modulesMap2;
+
     @Override
     public void start(Stage stage) {
         // GUI layout setup
@@ -41,7 +50,7 @@ public class BachelorProgramBuilder extends Application {
         gridPane.setVgap(5);
         gridPane.setHgap(5);
         // Use 4 ColumnConstraints to allow each column to be sizing equally
-        for (int i=0; i<4; i++) {
+        for (int i = 0; i < 4; i++) {
             ColumnConstraints column = new ColumnConstraints();
             column.setPercentWidth(25);
             gridPane.getColumnConstraints().add(column);
@@ -93,32 +102,56 @@ public class BachelorProgramBuilder extends Application {
             // Clear combo boxes
             basicStudiesBox.getItems().clear();
             SubjectModule1Box.getItems().clear();
+            Subject1Box.getItems().clear();
             SubjectModule2Box.getItems().clear();
+            Subject2Box.getItems().clear();
             ElectiveBox.getItems().clear();
             // Basics
             basicStudiesBox.focusedProperty().addListener((observable1, oldValue1, newValue1) -> {
                 if (newValue1) { // When focus is gained
-                    activitiesMap = fetchStudyActivities(selectedProgramId, 1, 3, 5);
+                    basicStudiesBox.getItems().clear(); // Clear here before fetching data
+                    activitiesMap = fetchBasicActivities(selectedProgramId, 1, 3, 5);
                     basicStudiesBox.getItems().addAll(activitiesMap.keySet());
                 }
             });
             // Subject Modules
             SubjectModule1Box.focusedProperty().addListener((observable1, oldValue1, newValue1) -> {
                 if (newValue1) { // When focus is gained
-                    activitiesMap = fetchStudyActivities(selectedProgramId, 2, 4);
-                    SubjectModule1Box.getItems().addAll(activitiesMap.keySet());
+                    SubjectModule1Box.getItems().clear(); // Clear here before fetching data
+                    Subject1Box.getItems().clear();
+                    modulesMap1 = fetchSubjectModules(MODULES_QUERY);
+                    SubjectModule1Box.getItems().addAll(modulesMap1.keySet());
+                }
+            });
+            Subject1Box.focusedProperty().addListener((observable1, oldValue1, newValue1) -> {
+                if (newValue1) { // When focus is gained
+                    Subject1Box.getItems().clear(); // Clear here before fetching data
+                    Integer selectedModule1Id = modulesMap1.get(SubjectModule1Box.getSelectionModel().getSelectedItem());
+                    activitiesMap = fetchModuleActivities(selectedProgramId, selectedModule1Id, 2, 4);
+                    Subject1Box.getItems().addAll(activitiesMap.keySet());
                 }
             });
             SubjectModule2Box.focusedProperty().addListener((observable1, oldValue1, newValue1) -> {
                 if (newValue1) { // When focus is gained
-                    activitiesMap = fetchStudyActivities(selectedProgramId, 2, 4);
-                    SubjectModule2Box.getItems().addAll(activitiesMap.keySet());
+                    SubjectModule2Box.getItems().clear(); // Clear here before fetching data
+                    Subject2Box.getItems().clear();
+                    modulesMap2 = fetchSubjectModules(MODULES_QUERY);
+                    SubjectModule2Box.getItems().addAll(modulesMap2.keySet());
+                }
+            });
+            Subject2Box.focusedProperty().addListener((observable1, oldValue1, newValue1) -> {
+                if (newValue1) { // When focus is gained
+                    Subject2Box.getItems().clear(); // Clear here before fetching data
+                    Integer selectedModule2Id = modulesMap2.get(SubjectModule2Box.getSelectionModel().getSelectedItem());
+                    activitiesMap = fetchModuleActivities(selectedProgramId, selectedModule2Id, 2, 4);
+                    Subject2Box.getItems().addAll(activitiesMap.keySet());
                 }
             });
             // Elective
             ElectiveBox.focusedProperty().addListener((observable1, oldValue1, newValue1) -> {
                 if (newValue1) { // When focus is gained
-                    activitiesMap = fetchStudyActivities(selectedProgramId, 1, 2);
+                    ElectiveBox.getItems().clear(); // Clear here before fetching data
+                    activitiesMap = fetchElectiveActivities(selectedProgramId, 1, 2);
                     ElectiveBox.getItems().addAll(activitiesMap.keySet());
                 }
             });
@@ -144,9 +177,10 @@ public class BachelorProgramBuilder extends Application {
         }
         return data;
     }
+
     // Fetch study activities for a program
-    private Map<String, Integer> fetchStudyActivities(int programId, int... activityTypes) {
-        StringBuilder sb = new StringBuilder(ACTIVITY_QUERY);
+    private Map<String, Integer> fetchBasicActivities(int programId, int... activityTypes) {
+        StringBuilder sb = new StringBuilder(BASIC_ACTIVITY_QUERY);
         sb.append(programId);
         sb.append(" AND type_id IN (");
         for (int i = 0; i < activityTypes.length; i++) {
@@ -155,7 +189,78 @@ public class BachelorProgramBuilder extends Application {
                 sb.append(",");
             }
         }
-        sb.append(")");
+        sb.append(") AND module_id is NULL"); // add this line
+        Map<String, Integer> data = new HashMap<>();
+        try {
+            Connection conn = DriverManager.getConnection(DATABASE_URL);
+            Statement stmt = conn.createStatement();
+            String query = sb.toString();
+            System.out.println(query);
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                data.put(rs.getString("name"), rs.getInt("type_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+    //Fetch subject modules
+    private Map<String, Integer> fetchSubjectModules(String query) {
+        Map<String, Integer> data = new HashMap<>();
+        try {
+            Connection conn = DriverManager.getConnection(DATABASE_URL);
+            Statement stmt = conn.createStatement();
+            System.out.println(query); // Print SQL statement
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                data.put(rs.getString("name"), rs.getInt("module_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+
+    //Fetch module activities
+    private Map<String, Integer> fetchModuleActivities(int programId, int moduleId, int... activityTypes) {
+        StringBuilder sb = new StringBuilder(MODULE_ACTIVITY_QUERY);
+        sb.append(programId);
+        sb.append(" AND type_id IN (");
+        for (int i = 0; i < activityTypes.length; i++) {
+            sb.append(activityTypes[i]);
+            if (i < activityTypes.length - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append(") AND module_id = ").append(moduleId);
+        Map<String, Integer> data = new HashMap<>();
+        try {
+            Connection conn = DriverManager.getConnection(DATABASE_URL);
+            Statement stmt = conn.createStatement();
+            String query = sb.toString();
+            System.out.println(query);
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                data.put(rs.getString("name"), rs.getInt("type_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+    //Fetch elective activities
+    private Map<String, Integer> fetchElectiveActivities(int programId, int... activityTypes) {
+        StringBuilder sb = new StringBuilder(BASIC_ACTIVITY_QUERY);
+        sb.append(programId);
+        sb.append(" AND type_id IN (");
+        for (int i = 0; i < activityTypes.length; i++) {
+            sb.append(activityTypes[i]);
+            if (i < activityTypes.length - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append(") AND module_id is NULL"); // add this line
         Map<String, Integer> data = new HashMap<>();
         try {
             Connection conn = DriverManager.getConnection(DATABASE_URL);

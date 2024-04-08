@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="62274121-598f-4a62-9b2e-ca503e17b27d" name="Changes" comment="clearing and populating comboboxes">
+    <list default="true" id="62274121-598f-4a62-9b2e-ca503e17b27d" name="Changes" comment="clearing and populating comboboxes bugfixes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/identifier.sqlite" beforeDir="false" afterPath="$PROJECT_DIR$/identifier.sqlite" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/portfolio_project_2/BachelorProgramBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/portfolio_project_2/BachelorProgramBuilder.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -111,7 +110,7 @@
       <workItem from="1712232007334" duration="5617000" />
       <workItem from="1712313554519" duration="6980000" />
       <workItem from="1712348172243" duration="5948000" />
-      <workItem from="1712488337158" duration="22557000" />
+      <workItem from="1712488337158" duration="23165000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -185,7 +184,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712576045430</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="clearing and populating comboboxes bugfixes">
+      <option name="closed" value="true" />
+      <created>1712577723558</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1712577723558</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -214,7 +221,8 @@
     <MESSAGE value="refactored code - divided study activities into basics, subject modules 1 and 2 and elective courses" />
     <MESSAGE value="GUI change" />
     <MESSAGE value="clearing and populating comboboxes" />
-    <option name="LAST_COMMIT_MESSAGE" value="clearing and populating comboboxes" />
+    <MESSAGE value="clearing and populating comboboxes bugfixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="clearing and populating comboboxes bugfixes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

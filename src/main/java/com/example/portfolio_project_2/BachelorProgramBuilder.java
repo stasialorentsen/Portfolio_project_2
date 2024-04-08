@@ -18,7 +18,7 @@ public class BachelorProgramBuilder extends Application {
 
     private static final String DATABASE_URL = "jdbc:sqlite:identifier.sqlite";
     private static final String PROGRAM_QUERY = "SELECT program_id, name FROM BachelorProgram";
-    private static final String ACTIVITY_QUERY = "SELECT activity_id, name, type_id FROM StudyActivity where program_id = ";
+    private static final String ACTIVITY_QUERY = "SELECT activity_id, name, type_id, ects FROM StudyActivity where program_id = ";
     private static final String MODULES_QUERY = "SELECT module_id, name FROM SubjectModule";
     private ComboBox<String> bachelorProgramBox = new ComboBox<>();
     private ComboBox<String> basicStudiesBox = new ComboBox<>();
@@ -93,6 +93,67 @@ public class BachelorProgramBuilder extends Application {
         gridPane.add(ElectiveBox, 3, 2);
         gridPane.add(addElectiveButton, 3, 4);
         gridPane.add(electiveAdded, 3, 5);
+
+        // Set actions for buttons
+        this.addBasicsButton.setOnAction(event -> {
+            String selectedItem = this.basicStudiesBox.getSelectionModel().getSelectedItem();
+
+            if (selectedItem == null || selectedItem.trim().isEmpty()) {
+                return; // nothing selected
+            }
+
+            String existingContents = this.basicsAdded.getText();
+            if (existingContents == null || existingContents.trim().isEmpty()) {
+                this.basicsAdded.setText(selectedItem); // if textArea is empty, set the selectedItem directly
+            } else {
+                this.basicsAdded.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
+            }
+        });
+
+        this.addSubject1Button.setOnAction(event -> {
+            String selectedItem = this.Subject1Box.getSelectionModel().getSelectedItem();
+
+            if (selectedItem == null || selectedItem.trim().isEmpty()) {
+                return; // nothing selected
+            }
+
+            String existingContents = this.subject1Added.getText();
+            if (existingContents == null || existingContents.trim().isEmpty()) {
+                this.subject1Added.setText(selectedItem); // if textArea is empty, set the selectedItem directly
+            } else {
+                this.subject1Added.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
+            }
+        });
+
+        this.addSubject2Button.setOnAction(event -> {
+            String selectedItem = this.Subject2Box.getSelectionModel().getSelectedItem();
+
+            if (selectedItem == null || selectedItem.trim().isEmpty()) {
+                return; // nothing selected
+            }
+
+            String existingContents = this.subject2Added.getText();
+            if (existingContents == null || existingContents.trim().isEmpty()) {
+                this.subject2Added.setText(selectedItem); // if textArea is empty, set the selectedItem directly
+            } else {
+                this.subject2Added.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
+            }
+        });
+
+        this.addElectiveButton.setOnAction(event -> {
+            String selectedItem = this.ElectiveBox.getSelectionModel().getSelectedItem();
+
+            if (selectedItem == null || selectedItem.trim().isEmpty()) {
+                return; // nothing selected
+            }
+
+            String existingContents = this.electiveAdded.getText();
+            if (existingContents == null || existingContents.trim().isEmpty()) {
+                this.electiveAdded.setText(selectedItem); // if textArea is empty, set the selectedItem directly
+            } else {
+                this.electiveAdded.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
+            }
+        });
 
         programsMap = fetchBachelorPrograms(PROGRAM_QUERY);
         bachelorProgramBox.getItems().addAll(programsMap.keySet());
@@ -197,7 +258,7 @@ public class BachelorProgramBuilder extends Application {
             System.out.println(query);
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                data.put(rs.getString("name"), rs.getInt("activity_id"));
+                data.put(rs.getString("name") + " (" + rs.getInt("ects") + " ects)", rs.getInt("activity_id"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -241,7 +302,7 @@ public class BachelorProgramBuilder extends Application {
             System.out.println(query);
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                data.put(rs.getString("name"), rs.getInt("activity_id"));
+                data.put(rs.getString("name") + " (" + rs.getInt("ects") + " ects)", rs.getInt("activity_id"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -268,7 +329,7 @@ public class BachelorProgramBuilder extends Application {
             System.out.println(query);
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                data.put(rs.getString("name"), rs.getInt("activity_id"));
+                data.put(rs.getString("name") + " (" + rs.getInt("ects") + " ects)", rs.getInt("activity_id"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

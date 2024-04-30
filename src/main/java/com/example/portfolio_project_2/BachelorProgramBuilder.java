@@ -29,14 +29,23 @@ public class BachelorProgramBuilder extends Application {
     private ComboBox<String> Subject1Box = new ComboBox<>();
     private ComboBox<String> Subject2Box = new ComboBox<>();
     private Button addBasicsButton = new Button("Add");
+    private Button removeBasicsButton = new Button("Remove");
     private Button addSubject1Button = new Button("Add");
+    private Button removeSubject1Button = new Button("Remove");
     private Button addSubject2Button = new Button("Add");
+    private Button removeSubject2Button = new Button("Remove");
     private Button addElectiveButton = new Button("Add");
+    private Button removeElectiveButton = new Button("Remove");
     private TextArea basicsAdded = new TextArea();
     private TextArea subject1Added = new TextArea();
     private TextArea subject2Added = new TextArea();
     private TextArea electiveAdded = new TextArea();
     private TextField totalEctsField = new TextField("Total ECTS: ");
+    // New field for studentId
+    private TextField studentIdField = new TextField();
+    private Label studentIdLabel = new Label("Enter Student ID here :");
+    //New button
+    private Button removeActivityButton = new Button("Remove");
 
     private Map<String, Integer> programsMap;
     private Map<String, Integer> activitiesMap;
@@ -74,6 +83,14 @@ public class BachelorProgramBuilder extends Application {
         addSubject1Button.setMaxWidth(Double.MAX_VALUE);
         addSubject2Button.setMaxWidth(Double.MAX_VALUE);
         addElectiveButton.setMaxWidth(Double.MAX_VALUE);
+        removeBasicsButton.setMaxWidth(Double.MAX_VALUE);
+        removeSubject1Button.setMaxWidth(Double.MAX_VALUE);
+        removeSubject2Button.setMaxWidth(Double.MAX_VALUE);
+        removeElectiveButton.setMaxWidth(Double.MAX_VALUE);
+
+        // Add new fields to gridPane
+        gridPane.add(studentIdLabel, 0, 7, 2, 1);
+        gridPane.add(studentIdField, 2, 7, 2, 1);
 
         totalEctsField.setDisable(true); // Disable editing
         gridPane.add(totalEctsField, 0, 6, 4, 1);
@@ -81,25 +98,29 @@ public class BachelorProgramBuilder extends Application {
         gridPane.add(bachelorProgramBox, 0, 0); // Top of the first column
         gridPane.add(basicsLabel, 0, 1); // 2nd row in the first column
         gridPane.add(basicStudiesBox, 0, 2); // 3rd row in the first column
-        gridPane.add(addBasicsButton, 0, 4); // 4th row in the first column
-        gridPane.add(basicsAdded, 0, 5); // 5th row in the first column
+        gridPane.add(addBasicsButton, 0, 4); // 5th row in the first column
+        gridPane.add(basicsAdded, 0, 5); // 6th row in the first column
+        gridPane.add(removeBasicsButton, 0, 6); //7th row in the first column
 
         gridPane.add(subject1Label, 1, 1);
         gridPane.add(SubjectModule1Box, 1, 2);
         gridPane.add(Subject1Box, 1, 3);
         gridPane.add(addSubject1Button, 1, 4);
         gridPane.add(subject1Added, 1, 5);
+        gridPane.add(removeSubject1Button, 1, 6);
 
         gridPane.add(subject2Label, 2, 1);
         gridPane.add(SubjectModule2Box, 2, 2);
         gridPane.add(Subject2Box, 2, 3);
         gridPane.add(addSubject2Button, 2, 4);
         gridPane.add(subject2Added, 2, 5);
+        gridPane.add(removeSubject2Button, 2, 6);
 
         gridPane.add(electiveLabel, 3, 1);
         gridPane.add(ElectiveBox, 3, 2);
         gridPane.add(addElectiveButton, 3, 4);
         gridPane.add(electiveAdded, 3, 5);
+        gridPane.add(removeElectiveButton, 3, 6);
 
         // Set actions for buttons
         this.addBasicsButton.setOnAction(event -> {
@@ -115,8 +136,21 @@ public class BachelorProgramBuilder extends Application {
             } else {
                 this.basicsAdded.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
             }
+            String studentId = this.studentIdField.getText();
+            if (studentId == null || studentId.trim().isEmpty()) {
+                System.out.println("Student ID must not be empty");
+                return; // No student id entered
+            }
+
+            Integer programId = this.programsMap.get(this.bachelorProgramBox.getSelectionModel().getSelectedItem());
+            if (programId == null) {
+                System.out.println("No Bachelor Program selected");
+                return; // Nothing selected in bachelorProgramBox
+            }
+
             int activityId = this.activitiesMap.get(selectedItem);
-            addToMyProgram(activityId);
+
+            addToMyProgram(studentId, activityId, totalEctsField);
         });
 
         this.addSubject1Button.setOnAction(event -> {
@@ -131,9 +165,21 @@ public class BachelorProgramBuilder extends Application {
             } else {
                 this.subject1Added.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
             }
-            if (this.subjectMap1.containsKey(selectedItem)) { // change from modulesMap1 to subjectMap1
-                int activityId = this.subjectMap1.get(selectedItem); // change from modulesMap1 to subjectMap1
-                addToMyProgram(activityId);
+            if (this.subjectMap1.containsKey(selectedItem)) {
+                int activityId = this.subjectMap1.get(selectedItem);
+                String studentId = this.studentIdField.getText();
+                if (studentId == null || studentId.trim().isEmpty()) {
+                    System.out.println("Student ID must not be empty");
+                    return; // No student id entered
+                }
+
+                Integer programId = this.programsMap.get(this.bachelorProgramBox.getSelectionModel().getSelectedItem());
+                if (programId == null) {
+                    System.out.println("No Bachelor Program selected");
+                    return; // Nothing selected in bachelorProgramBox
+                }
+
+                addToMyProgram(studentId, activityId, totalEctsField);
             }
         });
 
@@ -150,9 +196,21 @@ public class BachelorProgramBuilder extends Application {
             } else {
                 this.subject2Added.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
             }
-            if (this.subjectMap2.containsKey(selectedItem)) { // change from modulesMap2 to subjectMap2
-                int activityId = this.subjectMap2.get(selectedItem); // change from modulesMap2 to subjectMap2
-                addToMyProgram(activityId);
+            if (this.subjectMap2.containsKey(selectedItem)) {
+                int activityId = this.subjectMap2.get(selectedItem);
+                String studentId = this.studentIdField.getText();
+                if (studentId == null || studentId.trim().isEmpty()) {
+                    System.out.println("Student ID must not be empty");
+                    return; // No student id entered
+                }
+
+                Integer programId = this.programsMap.get(this.bachelorProgramBox.getSelectionModel().getSelectedItem());
+                if (programId == null) {
+                    System.out.println("No Bachelor Program selected");
+                    return; // Nothing selected in bachelorProgramBox
+                }
+
+                addToMyProgram(studentId, activityId, totalEctsField);
             }
         });
 
@@ -169,8 +227,22 @@ public class BachelorProgramBuilder extends Application {
             } else {
                 this.electiveAdded.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
             }
+
             int activityId = this.activitiesMap.get(selectedItem);
-            addToMyProgram(activityId);
+
+            String studentId = this.studentIdField.getText();
+            if (studentId == null || studentId.trim().isEmpty()) {
+                System.out.println("Student ID must not be empty");
+                return; // No student id entered
+            }
+
+            Integer programId = this.programsMap.get(this.bachelorProgramBox.getSelectionModel().getSelectedItem());
+            if (programId == null) {
+                System.out.println("No Bachelor Program selected");
+                return; // Nothing selected in bachelorProgramBox
+            }
+
+            addToMyProgram(studentId, activityId, totalEctsField);
         });
 
         programsMap = fetchBachelorPrograms(PROGRAM_QUERY);
@@ -205,10 +277,6 @@ public class BachelorProgramBuilder extends Application {
                 if (newValue1) { // When focus is gained
                     Subject1Box.getItems().clear(); // Clear here before fetching data
                     Integer selectedModule1Id = modulesMap1.get(SubjectModule1Box.getSelectionModel().getSelectedItem());
-//                    activitiesMap = fetchModuleActivities(selectedProgramId, selectedModule1Id, 2, 4);
-//                    Subject1Box.getItems().addAll(activitiesMap.keySet());
-//                }
-//            });
                     this.subjectMap1 = fetchModuleActivities(selectedProgramId, selectedModule1Id, 2, 4); // Save returned map to reference later
                     Subject1Box.getItems().addAll(this.subjectMap1.keySet());
                 }
@@ -225,10 +293,6 @@ public class BachelorProgramBuilder extends Application {
                 if (newValue1) { // When focus is gained
                     Subject2Box.getItems().clear(); // Clear here before fetching data
                     Integer selectedModule2Id = modulesMap2.get(SubjectModule2Box.getSelectionModel().getSelectedItem());
-//                    activitiesMap = fetchModuleActivities(selectedProgramId, selectedModule2Id, 2, 4);
-//                    Subject2Box.getItems().addAll(activitiesMap.keySet());
-//                }
-//            });
                     this.subjectMap2 = fetchModuleActivities(selectedProgramId, selectedModule2Id, 2, 4); // Save returned map to reference later
                     Subject2Box.getItems().addAll(this.subjectMap2.keySet());
                 }
@@ -247,12 +311,13 @@ public class BachelorProgramBuilder extends Application {
         stage.setScene(scene);
         stage.show();
     }
+
     // Fetch bachelor program names and IDs
     private Map<String, Integer> fetchBachelorPrograms(String query) {
         Map<String, Integer> data = new HashMap<>();
         try (
-            Connection conn = getConnection();
-            Statement stmt = conn.createStatement();
+                Connection conn = getConnection();
+                Statement stmt = conn.createStatement();
         ) {
             System.out.println(query); // Print SQL statement
             ResultSet rs = stmt.executeQuery(query);
@@ -279,8 +344,8 @@ public class BachelorProgramBuilder extends Application {
         sb.append(") AND module_id IS NULL");
         Map<String, Integer> data = new HashMap<>();
         try (
-            Connection conn = getConnection();
-            Statement stmt = conn.createStatement();
+                Connection conn = getConnection();
+                Statement stmt = conn.createStatement();
         ) {
             String query = sb.toString();
             System.out.println(query);
@@ -293,12 +358,13 @@ public class BachelorProgramBuilder extends Application {
         }
         return data;
     }
+
     //Fetch subject modules
     private Map<String, Integer> fetchSubjectModules(String query) {
         Map<String, Integer> data = new HashMap<>();
         try (
-            Connection conn = getConnection();
-            Statement stmt = conn.createStatement();
+                Connection conn = getConnection();
+                Statement stmt = conn.createStatement();
         ) {
             System.out.println(query); // Print SQL statement
             ResultSet rs = stmt.executeQuery(query);
@@ -325,8 +391,8 @@ public class BachelorProgramBuilder extends Application {
         sb.append(") AND module_id = ").append(moduleId);
         Map<String, Integer> data = new HashMap<>();
         try (
-            Connection conn = getConnection();
-            Statement stmt = conn.createStatement();
+                Connection conn = getConnection();
+                Statement stmt = conn.createStatement();
         ) {
             String query = sb.toString();
             System.out.println(query);
@@ -341,6 +407,7 @@ public class BachelorProgramBuilder extends Application {
         }
         return data;
     }
+
     //Fetch elective activities
     private Map<String, Integer> fetchElectiveActivities(int programId, int... activityTypes) {
         StringBuilder sb = new StringBuilder(ACTIVITY_QUERY);
@@ -355,8 +422,8 @@ public class BachelorProgramBuilder extends Application {
         sb.append(")");  // Added this to close the parenthesis
         Map<String, Integer> data = new HashMap<>();
         try (
-            Connection conn = getConnection();
-            Statement stmt = conn.createStatement();
+                Connection conn = getConnection();
+                Statement stmt = conn.createStatement();
         ) {
             String query = sb.toString();
             System.out.println(query);
@@ -370,34 +437,50 @@ public class BachelorProgramBuilder extends Application {
         return data;
     }
 
-    //Add selected activities to MyProgram
-    private void addToMyProgram(int activityId) {
+    // Fetch ECTS for a specific activity in the database
+    private int fetchEctsForActivity(int activityId) {
+        String query = "SELECT ects FROM StudyActivity WHERE activity_id = " + activityId;
+        try (
+                Connection conn = getConnection();
+                Statement stmt = conn.createStatement();
+        ) {
+            ResultSet rs = stmt.executeQuery(query);
+            if (rs.next()) {
+                return rs.getInt("ects");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0; // Return 0 if no ECTS found. You may want to handle this case differently.
+    }
+
+    // Add selected activities to MyProgram
+    private void addToMyProgram(String studentId, Integer activityId, TextField totalEctsField) {
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
-                     "INSERT INTO MyProgram SELECT * FROM StudyActivity WHERE activity_id = ?")) {
-            if (conn != null) {
-                System.out.println("Connected to the database.");
-                pstmt.setInt(1, activityId);
-                int result = pstmt.executeUpdate();
-                if (result > 0) {
-                    System.out.println("Activity Added to MyProgram");
-                } else {
-                    System.out.println("The activity could not be added to MyProgram.");
-                }
-                fetchAndDisplayTotalEcts(totalEctsField);
+                     "INSERT INTO MyProgram (student_id, activity_id, ects) VALUES (?, ?, ?)")) {
+            int ectsValue = fetchEctsForActivity(activityId);
+            pstmt.setString(1, studentId);
+            pstmt.setInt(2, activityId);
+            pstmt.setInt(3, ectsValue);
+            int result = pstmt.executeUpdate();
+            if (result > 0) {
+                System.out.println("Activity Added to MyProgram");
             } else {
-                System.out.println("Failed to make connection!");
+                System.out.println("The activity could not be added to MyProgram.");
             }
+            fetchAndDisplayTotalEcts(studentId, totalEctsField);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private void fetchAndDisplayTotalEcts(TextField textField) {
-        String query = "SELECT SUM(ects) as total_ects FROM MyProgram";
+    private void fetchAndDisplayTotalEcts(String studentId, TextField textField) {
+        String query = "SELECT SUM(ects) as total_ects FROM MyProgram WHERE student_id='" + studentId + "'";
+
         try (
-            Connection conn = getConnection();
-            Statement stmt = conn.createStatement();
+                Connection conn = getConnection();
+                Statement stmt = conn.createStatement();
         ) {
             ResultSet rs = stmt.executeQuery(query);
             if (rs.next()) {
@@ -407,8 +490,5 @@ public class BachelorProgramBuilder extends Application {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-    public static void main(String[] args) {
-        launch(args);
     }
 }

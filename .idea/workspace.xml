@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="62274121-598f-4a62-9b2e-ca503e17b27d" name="Changes" comment="db lock fix">
+    <list default="true" id="62274121-598f-4a62-9b2e-ca503e17b27d" name="Changes" comment="Adding to MyProgram by student_id, remove buttons">
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/cc12283b-46b5-4817-9e30-5c63971576a1.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/cc12283b-46b5-4817-9e30-5c63971576a1.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/identifier.sqlite" beforeDir="false" afterPath="$PROJECT_DIR$/identifier.sqlite" afterDir="false" />
@@ -113,7 +113,9 @@
       <workItem from="1712313554519" duration="6980000" />
       <workItem from="1712348172243" duration="5948000" />
       <workItem from="1712488337158" duration="27494000" />
-      <workItem from="1714490487600" duration="7965000" />
+      <workItem from="1714490487600" duration="8422000" />
+      <workItem from="1714507559137" duration="743000" />
+      <workItem from="1714508310405" duration="3399000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -211,7 +213,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714494697023</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Adding to MyProgram by student_id, remove buttons">
+      <option name="closed" value="true" />
+      <created>1714498844053</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1714498844053</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -243,7 +253,8 @@
     <MESSAGE value="clearing and populating comboboxes bugfixes" />
     <MESSAGE value="adding activities is done" />
     <MESSAGE value="db lock fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="db lock fix" />
+    <MESSAGE value="Adding to MyProgram by student_id, remove buttons" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding to MyProgram by student_id, remove buttons" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

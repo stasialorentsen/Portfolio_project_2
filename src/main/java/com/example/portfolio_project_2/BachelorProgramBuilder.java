@@ -5,7 +5,9 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
+import javafx.collections.ObservableList;
+import javafx.collections.FXCollections;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
@@ -36,10 +38,10 @@ public class BachelorProgramBuilder extends Application {
     private Button removeSubject2Button = new Button("Remove");
     private Button addElectiveButton = new Button("Add");
     private Button removeElectiveButton = new Button("Remove");
-    private TextArea basicsAdded = new TextArea();
-    private TextArea subject1Added = new TextArea();
-    private TextArea subject2Added = new TextArea();
-    private TextArea electiveAdded = new TextArea();
+    private ListView<String> basicsAdded = new ListView<>();
+    private ListView<String> subject1Added = new ListView<>();
+    private ListView<String> subject2Added = new ListView<>();
+    private ListView<String> electiveAdded = new ListView<>();
     private TextField totalEctsField = new TextField("Total ECTS: ");
     // New field for studentId
     private TextField studentIdField = new TextField();
@@ -72,6 +74,8 @@ public class BachelorProgramBuilder extends Application {
         Label subject1Label = new Label("Subject Module 1");
         Label subject2Label = new Label("Subject Module 2");
         Label electiveLabel = new Label("Elective");
+        Label programLabel = new Label("Program: ");
+
         bachelorProgramBox.setMaxWidth(Double.MAX_VALUE);
         basicStudiesBox.setMaxWidth(Double.MAX_VALUE);
         SubjectModule1Box.setMaxWidth(Double.MAX_VALUE);
@@ -89,160 +93,137 @@ public class BachelorProgramBuilder extends Application {
         removeElectiveButton.setMaxWidth(Double.MAX_VALUE);
 
         // Add new fields to gridPane
-        gridPane.add(studentIdLabel, 0, 7, 2, 1);
-        gridPane.add(studentIdField, 2, 7, 2, 1);
-
+        gridPane.add(studentIdLabel, 0, 0, 2, 1);
+        gridPane.add(studentIdField, 1, 0, 2, 1);
+        gridPane.add(programLabel, 0, 1,2,1);
+        gridPane.add(bachelorProgramBox, 1, 1,2,1);
+        gridPane.add(totalEctsField, 3, 1, 2, 1);
         totalEctsField.setDisable(true); // Disable editing
-        gridPane.add(totalEctsField, 0, 6, 4, 1);
 
-        gridPane.add(bachelorProgramBox, 0, 0); // Top of the first column
-        gridPane.add(basicsLabel, 0, 1); // 2nd row in the first column
-        gridPane.add(basicStudiesBox, 0, 2); // 3rd row in the first column
-        gridPane.add(addBasicsButton, 0, 4); // 5th row in the first column
-        gridPane.add(basicsAdded, 0, 5); // 6th row in the first column
-        gridPane.add(removeBasicsButton, 0, 6); //7th row in the first column
+//        gridPane.add(bachelorProgramBox, 0, 2); // Top of the second column
+        gridPane.add(basicsLabel, 0, 2); // 2nd row in the first column
+        gridPane.add(basicStudiesBox, 0, 3); // 3rd row in the first column
+        gridPane.add(addBasicsButton, 0, 5); // 5th row in the first column
+        gridPane.add(basicsAdded, 0, 6); // 6th row in the first column
+        gridPane.add(removeBasicsButton, 0, 7); //7th row in the first column
 
-        gridPane.add(subject1Label, 1, 1);
-        gridPane.add(SubjectModule1Box, 1, 2);
-        gridPane.add(Subject1Box, 1, 3);
-        gridPane.add(addSubject1Button, 1, 4);
-        gridPane.add(subject1Added, 1, 5);
-        gridPane.add(removeSubject1Button, 1, 6);
+        gridPane.add(subject1Label, 1, 2);
+        gridPane.add(SubjectModule1Box, 1, 3);
+        gridPane.add(Subject1Box, 1, 4);
+        gridPane.add(addSubject1Button, 1, 5);
+        gridPane.add(subject1Added, 1, 6);
+        gridPane.add(removeSubject1Button, 1, 7);
 
-        gridPane.add(subject2Label, 2, 1);
-        gridPane.add(SubjectModule2Box, 2, 2);
-        gridPane.add(Subject2Box, 2, 3);
-        gridPane.add(addSubject2Button, 2, 4);
-        gridPane.add(subject2Added, 2, 5);
-        gridPane.add(removeSubject2Button, 2, 6);
+        gridPane.add(subject2Label, 2, 2);
+        gridPane.add(SubjectModule2Box, 2, 3);
+        gridPane.add(Subject2Box, 2, 4);
+        gridPane.add(addSubject2Button, 2, 5);
+        gridPane.add(subject2Added, 2, 6);
+        gridPane.add(removeSubject2Button, 2, 7);
 
-        gridPane.add(electiveLabel, 3, 1);
-        gridPane.add(ElectiveBox, 3, 2);
-        gridPane.add(addElectiveButton, 3, 4);
-        gridPane.add(electiveAdded, 3, 5);
-        gridPane.add(removeElectiveButton, 3, 6);
+        gridPane.add(electiveLabel, 3, 2);
+        gridPane.add(ElectiveBox, 3, 3);
+        gridPane.add(addElectiveButton, 3, 5);
+        gridPane.add(electiveAdded, 3, 6);
+        gridPane.add(removeElectiveButton, 3, 7);
 
         // Set actions for buttons
         this.addBasicsButton.setOnAction(event -> {
             String selectedItem = this.basicStudiesBox.getSelectionModel().getSelectedItem();
+            if (selectedItem != null && !selectedItem.trim().isEmpty()) {
+                basicsAdded.getItems().add(selectedItem);
 
-            if (selectedItem == null || selectedItem.trim().isEmpty()) {
-                return; // nothing selected
-            }
-
-            String existingContents = this.basicsAdded.getText();
-            if (existingContents == null || existingContents.trim().isEmpty()) {
-                this.basicsAdded.setText(selectedItem); // if textArea is empty, set the selectedItem directly
-            } else {
-                this.basicsAdded.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
-            }
-            String studentId = this.studentIdField.getText();
-            if (studentId == null || studentId.trim().isEmpty()) {
-                System.out.println("Student ID must not be empty");
-                return; // No student id entered
-            }
-
-            Integer programId = this.programsMap.get(this.bachelorProgramBox.getSelectionModel().getSelectedItem());
-            if (programId == null) {
-                System.out.println("No Bachelor Program selected");
-                return; // Nothing selected in bachelorProgramBox
-            }
-
-            int activityId = this.activitiesMap.get(selectedItem);
-
-            addToMyProgram(studentId, activityId, totalEctsField);
-        });
-
-        this.addSubject1Button.setOnAction(event -> {
-            String selectedItem = this.Subject1Box.getSelectionModel().getSelectedItem();
-
-            if (selectedItem == null || selectedItem.trim().isEmpty()) {
-                return; // nothing selected
-            }
-            String existingContents = this.subject1Added.getText();
-            if (existingContents == null || existingContents.trim().isEmpty()) {
-                this.subject1Added.setText(selectedItem); // if textArea is empty, set the selectedItem directly
-            } else {
-                this.subject1Added.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
-            }
-            if (this.subjectMap1.containsKey(selectedItem)) {
-                int activityId = this.subjectMap1.get(selectedItem);
                 String studentId = this.studentIdField.getText();
                 if (studentId == null || studentId.trim().isEmpty()) {
                     System.out.println("Student ID must not be empty");
                     return; // No student id entered
                 }
-
                 Integer programId = this.programsMap.get(this.bachelorProgramBox.getSelectionModel().getSelectedItem());
                 if (programId == null) {
                     System.out.println("No Bachelor Program selected");
                     return; // Nothing selected in bachelorProgramBox
                 }
+                int activityId = this.activitiesMap.get(selectedItem);
+                addToMyProgram(studentId, activityId, totalEctsField);
+            }
+        });
 
+        this.addSubject1Button.setOnAction(event -> {
+            String selectedItem = this.Subject1Box.getSelectionModel().getSelectedItem();
+            if (selectedItem != null && !selectedItem.trim().isEmpty()) {
+                subject1Added.getItems().add(selectedItem);
+                String studentId = this.studentIdField.getText();
+                if (studentId == null || studentId.trim().isEmpty()) {
+                    System.out.println("Student ID must not be empty");
+                    return;
+                }
+                Integer programId = this.programsMap.get(this.bachelorProgramBox.getSelectionModel().getSelectedItem());
+                if (programId == null) {
+                    System.out.println("No Bachelor Program selected");
+                    return;
+                }
+                int activityId = this.subjectMap1.get(selectedItem);
                 addToMyProgram(studentId, activityId, totalEctsField);
             }
         });
 
         this.addSubject2Button.setOnAction(event -> {
             String selectedItem = this.Subject2Box.getSelectionModel().getSelectedItem();
-
-            if (selectedItem == null || selectedItem.trim().isEmpty()) {
-                return; // nothing selected
-            }
-
-            String existingContents = this.subject2Added.getText();
-            if (existingContents == null || existingContents.trim().isEmpty()) {
-                this.subject2Added.setText(selectedItem); // if textArea is empty, set the selectedItem directly
-            } else {
-                this.subject2Added.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
-            }
-            if (this.subjectMap2.containsKey(selectedItem)) {
-                int activityId = this.subjectMap2.get(selectedItem);
+            if (selectedItem != null && !selectedItem.trim().isEmpty()) {
+                subject2Added.getItems().add(selectedItem);
                 String studentId = this.studentIdField.getText();
                 if (studentId == null || studentId.trim().isEmpty()) {
                     System.out.println("Student ID must not be empty");
-                    return; // No student id entered
+                    return;
                 }
-
                 Integer programId = this.programsMap.get(this.bachelorProgramBox.getSelectionModel().getSelectedItem());
                 if (programId == null) {
                     System.out.println("No Bachelor Program selected");
-                    return; // Nothing selected in bachelorProgramBox
+                    return;
                 }
-
+                int activityId = this.subjectMap2.get(selectedItem);
                 addToMyProgram(studentId, activityId, totalEctsField);
             }
         });
 
         this.addElectiveButton.setOnAction(event -> {
             String selectedItem = this.ElectiveBox.getSelectionModel().getSelectedItem();
-
-            if (selectedItem == null || selectedItem.trim().isEmpty()) {
-                return; // nothing selected
+            if (selectedItem != null && !selectedItem.trim().isEmpty()) {
+                electiveAdded.getItems().add(selectedItem);
+                String studentId = this.studentIdField.getText();
+                if (studentId == null || studentId.trim().isEmpty()) {
+                    System.out.println("Student ID must not be empty");
+                    return;
+                }
+                Integer programId = this.programsMap.get(this.bachelorProgramBox.getSelectionModel().getSelectedItem());
+                if (programId == null) {
+                    System.out.println("No Bachelor Program selected");
+                    return;
+                }
+                int activityId = this.activitiesMap.get(selectedItem);
+                addToMyProgram(studentId, activityId, totalEctsField);
             }
+        });
 
-            String existingContents = this.electiveAdded.getText();
-            if (existingContents == null || existingContents.trim().isEmpty()) {
-                this.electiveAdded.setText(selectedItem); // if textArea is empty, set the selectedItem directly
-            } else {
-                this.electiveAdded.setText(existingContents + "\n" + selectedItem); // otherwise, append with a newline
-            }
-
-            int activityId = this.activitiesMap.get(selectedItem);
-
-            String studentId = this.studentIdField.getText();
-            if (studentId == null || studentId.trim().isEmpty()) {
-                System.out.println("Student ID must not be empty");
-                return; // No student id entered
-            }
-
-            Integer programId = this.programsMap.get(this.bachelorProgramBox.getSelectionModel().getSelectedItem());
-            if (programId == null) {
-                System.out.println("No Bachelor Program selected");
-                return; // Nothing selected in bachelorProgramBox
-            }
-
-            addToMyProgram(studentId, activityId, totalEctsField);
+        this.removeBasicsButton.setOnAction(event -> {
+            String selectedItem = this.basicsAdded.getSelectionModel().getSelectedItem();
+            this.basicsAdded.getItems().remove(selectedItem);
+            removeFromMyProgram(studentIdField.getText(), this.activitiesMap.get(selectedItem), totalEctsField);
+        });
+        this.removeSubject1Button.setOnAction(event -> {
+            String selectedItem = this.subject1Added.getSelectionModel().getSelectedItem();
+            this.subject1Added.getItems().remove(selectedItem);
+            removeFromMyProgram(studentIdField.getText(), this.subjectMap1.get(selectedItem), totalEctsField);
+        });
+        this.removeSubject2Button.setOnAction(event -> {
+            String selectedItem = this.subject2Added.getSelectionModel().getSelectedItem();
+            this.subject2Added.getItems().remove(selectedItem);
+            removeFromMyProgram(studentIdField.getText(), this.subjectMap2.get(selectedItem), totalEctsField);
+        });
+        this.removeElectiveButton.setOnAction(event -> {
+            String selectedItem = this.electiveAdded.getSelectionModel().getSelectedItem();
+            this.electiveAdded.getItems().remove(selectedItem);
+            removeFromMyProgram(studentIdField.getText(), this.activitiesMap.get(selectedItem), totalEctsField);
         });
 
         programsMap = fetchBachelorPrograms(PROGRAM_QUERY);
@@ -475,6 +456,23 @@ public class BachelorProgramBuilder extends Application {
         }
     }
 
+    private void removeFromMyProgram(String studentId, Integer activityId, TextField totalEctsField) {
+        try(Connection conn = getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(
+                    "DELETE FROM MyProgram WHERE student_id = ? AND activity_id = ?")) {
+            pstmt.setString(1, studentId);
+            pstmt.setInt(2, activityId);
+            int result = pstmt.executeUpdate();
+            if (result > 0) {
+                System.out.println("Activity Removed from MyProgram");
+            } else {
+                System.out.println("The activity could not be removed from MyProgram.");
+            }
+            fetchAndDisplayTotalEcts(studentId, totalEctsField);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     private void fetchAndDisplayTotalEcts(String studentId, TextField textField) {
         String query = "SELECT SUM(ects) as total_ects FROM MyProgram WHERE student_id='" + studentId + "'";
 

@@ -15,9 +15,9 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BachelorProgramBuilder extends Application {
+import static com.example.portfolio_project_2.DatabaseConnection.getConnection;
 
-    private static final String DATABASE_URL = "jdbc:sqlite:identifier.sqlite";
+public class BachelorProgramBuilder extends Application {
     private static final String PROGRAM_QUERY = "SELECT program_id, name FROM BachelorProgram";
     private static final String ACTIVITY_QUERY = "SELECT activity_id, name, type_id, ects FROM StudyActivity where program_id = ";
     private static final String MODULES_QUERY = "SELECT module_id, name FROM SubjectModule";
@@ -250,16 +250,17 @@ public class BachelorProgramBuilder extends Application {
     // Fetch bachelor program names and IDs
     private Map<String, Integer> fetchBachelorPrograms(String query) {
         Map<String, Integer> data = new HashMap<>();
-        try {
-            Connection conn = DriverManager.getConnection(DATABASE_URL);
+        try (
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
+        ) {
             System.out.println(query); // Print SQL statement
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 data.put(rs.getString("name"), rs.getInt("program_id"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); //TO-DO: logger
         }
         return data;
     }
@@ -277,9 +278,10 @@ public class BachelorProgramBuilder extends Application {
         }
         sb.append(") AND module_id IS NULL");
         Map<String, Integer> data = new HashMap<>();
-        try {
-            Connection conn = DriverManager.getConnection(DATABASE_URL);
+        try (
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
+        ) {
             String query = sb.toString();
             System.out.println(query);
             ResultSet rs = stmt.executeQuery(query);
@@ -294,9 +296,10 @@ public class BachelorProgramBuilder extends Application {
     //Fetch subject modules
     private Map<String, Integer> fetchSubjectModules(String query) {
         Map<String, Integer> data = new HashMap<>();
-        try {
-            Connection conn = DriverManager.getConnection(DATABASE_URL);
+        try (
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
+        ) {
             System.out.println(query); // Print SQL statement
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
@@ -321,9 +324,10 @@ public class BachelorProgramBuilder extends Application {
         }
         sb.append(") AND module_id = ").append(moduleId);
         Map<String, Integer> data = new HashMap<>();
-        try {
-            Connection conn = DriverManager.getConnection(DATABASE_URL);
+        try (
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
+        ) {
             String query = sb.toString();
             System.out.println(query);
             ResultSet rs = stmt.executeQuery(query);
@@ -350,9 +354,10 @@ public class BachelorProgramBuilder extends Application {
         }
         sb.append(")");  // Added this to close the parenthesis
         Map<String, Integer> data = new HashMap<>();
-        try {
-            Connection conn = DriverManager.getConnection(DATABASE_URL);
+        try (
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
+        ) {
             String query = sb.toString();
             System.out.println(query);
             ResultSet rs = stmt.executeQuery(query);
@@ -367,7 +372,7 @@ public class BachelorProgramBuilder extends Application {
 
     //Add selected activities to MyProgram
     private void addToMyProgram(int activityId) {
-        try (Connection conn = DriverManager.getConnection(DATABASE_URL);
+        try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
                      "INSERT INTO MyProgram SELECT * FROM StudyActivity WHERE activity_id = ?")) {
             if (conn != null) {
@@ -390,9 +395,10 @@ public class BachelorProgramBuilder extends Application {
 
     private void fetchAndDisplayTotalEcts(TextField textField) {
         String query = "SELECT SUM(ects) as total_ects FROM MyProgram";
-        try {
-            Connection conn = DriverManager.getConnection(DATABASE_URL);
+        try (
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
+        ) {
             ResultSet rs = stmt.executeQuery(query);
             if (rs.next()) {
                 int totalEcts = rs.getInt("total_ects");

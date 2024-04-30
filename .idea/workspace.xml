@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="62274121-598f-4a62-9b2e-ca503e17b27d" name="Changes" comment="Adding to MyProgram by student_id, remove buttons">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/cc12283b-46b5-4817-9e30-5c63971576a1.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/cc12283b-46b5-4817-9e30-5c63971576a1.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/identifier.sqlite" beforeDir="false" afterPath="$PROJECT_DIR$/identifier.sqlite" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/portfolio_project_2/BachelorProgramBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/portfolio_project_2/BachelorProgramBuilder.java" afterDir="false" />
-    </list>
+    <list default="true" id="62274121-598f-4a62-9b2e-ca503e17b27d" name="Changes" comment="replaced textArea with ListView, remove buttons functionality" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -115,7 +110,7 @@
       <workItem from="1712488337158" duration="27494000" />
       <workItem from="1714490487600" duration="8422000" />
       <workItem from="1714507559137" duration="743000" />
-      <workItem from="1714508310405" duration="3399000" />
+      <workItem from="1714508310405" duration="3718000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
@@ -221,7 +216,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714498844053</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="replaced textArea with ListView, remove buttons functionality">
+      <option name="closed" value="true" />
+      <created>1714511911649</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1714511911649</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -254,7 +257,8 @@
     <MESSAGE value="adding activities is done" />
     <MESSAGE value="db lock fix" />
     <MESSAGE value="Adding to MyProgram by student_id, remove buttons" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding to MyProgram by student_id, remove buttons" />
+    <MESSAGE value="replaced textArea with ListView, remove buttons functionality" />
+    <option name="LAST_COMMIT_MESSAGE" value="replaced textArea with ListView, remove buttons functionality" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
